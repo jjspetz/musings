@@ -3,9 +3,11 @@ import get_analytics as analytics
 app = Flask(__name__)
 
 VIEW_ID = '163519985'
+TIME_FRAME = '30'
+COMPARE = False
 
 def home():
-    data = analytics.main(VIEW_ID)
+    data = analytics.main(VIEW_ID, TIME_FRAME, COMPARE)
     account_data = analytics.get_account_info()
     site = {}
     for account in account_data.get('items', []):
@@ -17,7 +19,7 @@ def home():
 
 @app.route('/json')
 def return_json():
-    return jsonify(analytics.main(VIEW_ID))
+    return jsonify(analytics.main(VIEW_ID, TIME_FRAME, COMPARE))
 
 @app.route('/account')
 def return_account():
@@ -25,7 +27,7 @@ def return_account():
 
 @app.route('/')
 def home():
-    data = analytics.main(VIEW_ID)
+    data = analytics.main(VIEW_ID, TIME_FRAME, COMPARE)
     account_data = analytics.get_account_info()
     site = {}
     for account in account_data.get('items', []):
@@ -38,8 +40,9 @@ def home():
 @app.route('/change', methods=['POST'])
 def set_project():
     global VIEW_ID
-    results = dict(request.form).get('site')[0]
-    VIEW_ID = results
+    global TIME_FRAME
+    VIEW_ID = dict(request.form).get('site')[0]
+    TIME_FRAME = dict(request.form).get('time')[0]
     return redirect(url_for('home'))
 
 @app.route('/hello/<name>')

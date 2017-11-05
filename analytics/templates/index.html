@@ -9,16 +9,22 @@
   </head>
   <body>
     <form action="/change" method="post">
-        <label>Select a Site</label>
+        <label>Select Search Criteria</label>
         <select name="site">
          {% for item in account %}
            <option value={{account[item]}}>{{item}}</option>
          {% endfor %}
        </select>
+       <select name="time">
+         <option value='30'>Month</option>
+         <option value='7'>Week</option>
+         <option value='1'>Day</option>
+      </select>
        <button type='submit'>
          Update
        </button>
     </form>
+    <!-- wrap in if statement -->
     <table class="table table-striped">
       <thead>
         <tr>

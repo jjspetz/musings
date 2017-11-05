@@ -73,7 +73,7 @@ def initialize_analyticsreporting():
   return analytics
 
 
-def get_report(analytics, view_id):
+def get_report(analytics, view_id, time_frame, compare):
   """Queries the Analytics Reporting API V4.
 
   Args:
@@ -81,27 +81,35 @@ def get_report(analytics, view_id):
   Returns:
     The Analytics Reporting API V4 response.
   """
+  if (compare):
+      return analytics.reports().batchGet(
+          body={
+            'reportRequests': [
+            # report for compare
+            {
+              'viewId': view_id,
+              'dateRanges': [{'startDate': str(int(time_frame)*2), 'daysAgo': time_frame + 'daysAgo'}],
+              'metrics': METRICS,
+                'dimensions': [{'name': 'ga:channelGrouping'}]
+            },
+            ]
+          }
+      ).execute()
+  else:
+      return analytics.reports().batchGet(
+          body={
+            'reportRequests': [
+            # report for basic
+            {
+              'viewId': view_id,
+              'dateRanges': [{'startDate': time_frame + 'daysAgo', 'endDate': 'today'}],
+              'metrics': METRICS,
+                'dimensions': [{'name': 'ga:channelGrouping'}]
+            },
+            ]
+          }
+      ).execute()
 
-  return analytics.reports().batchGet(
-      body={
-        'reportRequests': [
-        # report for charts
-        # {
-        #   'viewId': view_id,
-        #   'dateRanges': [{'startDate': '30daysAgo', 'endDate': 'today'}],
-        #   'metrics': METRICS,
-        #     # 'dimensions': [{'name': 'ga:date'}],
-        # },
-        # report for benchmarking
-        {
-          'viewId': view_id,
-          'dateRanges': [{'startDate': '30daysAgo', 'endDate': 'today'}],
-          'metrics': METRICS,
-            'dimensions': [{'name': 'ga:channelGrouping'}]
-        },
-        ]
-      }
-  ).execute()
 
 # ALL PRINT functions mainly for testing purposes, remove later
 def print_response(response):
@@ -165,9 +173,9 @@ def get_account_info():
 
     return account_summaries
 
-def main(view_id):
+def main(view_id, time_frame, compare):
   analytics = initialize_analyticsreporting()
-  response = get_report(analytics, view_id)
+  response = get_report(analytics, view_id, time_frame, compare)
   return response
 
 if __name__ == '__main__':
