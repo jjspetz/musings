@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Analyitcs Demo</title>
+    <link rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"
+      integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ"
+      crossorigin="anonymous">
+  </head>
+  <body>
+    <form action="/change" method="post">
+        <label>Select Search Criteria</label>
+        <select name="site">
+         {% for item in account %}
+           <option value={{account[item]}}>{{item}}</option>
+         {% endfor %}
+       </select>
+       <select name="time">
+         <option value='30'>Month</option>
+         <option value='7'>Week</option>
+         <option value='1'>Day</option>
+      </select>
+       <button type='submit'>
+         Update
+       </button>
+    </form>
+    <!-- wrap in if statement -->
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">Default Channel Grouping</th>
+          {% for item in data.reports[0].columnHeader.metricHeader.metricHeaderEntries %}
+            <th scope="col">{{item.name}}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        <!-- total -->
+        <tr>
+          <th scope="row">Totals</th>
+          {% for item in data.reports[0].data.totals[0].values() %}
+            {% for value in item %}
+              <td>{{value}}</td>
+            {% endfor %}
+          {% endfor %}
+        </tr>
+
+        <!-- other channels -->
+        {% for row in data.reports[0].data.rows %}
+          <tr>
+            <th scope="row">{{row.dimensions[0]}}</th>
+            {% for item in row.metrics[0].values() %}
+              {% for value in item %}
+                <td>{{value}}</td>
+              {% endfor %}
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <script>
+
+    </script>
+  </body>
+</html>

@@ -4,7 +4,7 @@ app = Flask(__name__)
 
 VIEW_ID = '163519985'
 TIME_FRAME = '30'
-COMPARE = False
+COMPARE = True
 
 def home():
     data = analytics.main(VIEW_ID, TIME_FRAME, COMPARE)
@@ -15,7 +15,10 @@ def home():
             name = property.get('name')
             for props in property.get('profiles', []):
                 site[name] = props.get('id')
-    return render_template('index.html', data=data, account=site)
+    if COMPARE:
+        return render_template('compare.html', data=data, account=site)
+    else:
+        return render_template('index.html', data=data, account=site)
 
 @app.route('/json')
 def return_json():

@@ -88,7 +88,7 @@ def get_report(analytics, view_id, time_frame, compare):
             # report for compare
             {
               'viewId': view_id,
-              'dateRanges': [{'startDate': str(int(time_frame)*2), 'daysAgo': time_frame + 'daysAgo'}],
+              'dateRanges': [{'startDate': str(int(time_frame)*2) + 'daysAgo', 'endDate': time_frame + 'daysAgo'}],
               'metrics': METRICS,
                 'dimensions': [{'name': 'ga:channelGrouping'}]
             },
