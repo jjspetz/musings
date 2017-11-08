@@ -1,24 +1,11 @@
 from flask import Flask, render_template, jsonify, request, redirect, url_for
 import get_analytics as analytics
+from box import Box
 app = Flask(__name__)
 
 VIEW_ID = '163519985'
 TIME_FRAME = '30'
 COMPARE = True
-
-def home():
-    data = analytics.main(VIEW_ID, TIME_FRAME, COMPARE)
-    account_data = analytics.get_account_info()
-    site = {}
-    for account in account_data.get('items', []):
-        for property in account.get('webProperties', []):
-            name = property.get('name')
-            for props in property.get('profiles', []):
-                site[name] = props.get('id')
-    if COMPARE:
-        return render_template('compare.html', data=data, account=site)
-    else:
-        return render_template('index.html', data=data, account=site)
 
 @app.route('/json')
 def return_json():
@@ -31,14 +18,40 @@ def return_account():
 @app.route('/')
 def home():
     data = analytics.main(VIEW_ID, TIME_FRAME, COMPARE)
+    other = Box(data)
     account_data = analytics.get_account_info()
     site = {}
+    total_val = []
+    metric_val = []
+
     for account in account_data.get('items', []):
         for property in account.get('webProperties', []):
             name = property.get('name')
             for props in property.get('profiles', []):
                 site[name] = props.get('id')
-    return render_template('index.html', data=data, account=site)
+
+    values = []
+    # data.reports[0].data.totals[0].values()
+    for total in other.reports[0].data.totals:
+        for val in total.values():
+            for num in val:
+                values.append(num)
+
+    for i in range(int(len(values)/2)):
+        total_val.append([values[i], values[i+10], calc_percent(values[i], values[i+10])])
+
+    values = []
+    # data.reports[0].data.rows.metrics[0].values()
+    for row in other.reports[0].data.rows:
+        for metric in row.metrics:
+            for val in metric.values():
+                for num in val:
+                    values.append(num)
+
+    for i in range(int(len(values)/2)):
+        metric_val.append([values[i], values[i+10], calc_percent(values[i], values[i+10])])
+
+    return render_template('index.html', data=data, account=site, total=total_val, metric=metric_val)
 
 @app.route('/change', methods=['POST'])
 def set_project():
@@ -52,3 +65,13 @@ def set_project():
 def hello(name):
     # show the user profile for that user
     return ('Hello %s' % name)
+
+
+# functions
+def calc_percent(a, b):
+    a = float(a)
+    b = float(b)
+    if b > 0:
+        return ((a - b) / b)*100
+    else:
+        return 100
