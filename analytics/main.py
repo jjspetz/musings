@@ -3,6 +3,10 @@ import get_analytics as analytics
 from box import Box
 app = Flask(__name__)
 
+# TODO
+# 1) add current stats to display
+# 2) add compare toggle
+
 VIEW_ID = '163519985'
 TIME_FRAME = '30'
 COMPARE = True
@@ -40,16 +44,17 @@ def home():
     for i in range(int(len(values)/2)):
         total_val.append([values[i], values[i+10], calc_percent(values[i], values[i+10])])
 
-    values = []
+
     # data.reports[0].data.rows.metrics[0].values()
     for row in other.reports[0].data.rows:
+        name = row.dimensions[0]
+        values = []
         for metric in row.metrics:
             for val in metric.values():
                 for num in val:
                     values.append(num)
-
-    for i in range(int(len(values)/2)):
-        metric_val.append([values[i], values[i+10], calc_percent(values[i], values[i+10])])
+        for i in range(int(len(values)/2)):
+            metric_val.append([values[i], values[i+10], calc_percent(values[i], values[i+10]), name])
 
     return render_template('index.html', data=data, account=site, total=total_val, metric=metric_val)
 
@@ -71,7 +76,9 @@ def hello(name):
 def calc_percent(a, b):
     a = float(a)
     b = float(b)
-    if b > 0:
+    if a == 0 and b == 0:
+        return 0
+    elif b > 0:
         return ((a - b) / b)*100
     else:
         return 100

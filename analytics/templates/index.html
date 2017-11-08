@@ -94,19 +94,20 @@
           <tr>
             <th scope="row">{{row.dimensions[0]}}</th>
             {% for value in metric %}
-              <td>
-                <div>
-                  {{'%0.1f'| format(value[2]|float)}}%
-                </div>
-                <div>
-                  {{'%0.1f'| format(value[0]|float)}} vs. {{'%0.1f'| format(value[1]|float)}}
-                </div>
-              </td>
+              {% if value[3] == row.dimensions[0] %}
+                <td>
+                  <div>
+                    {{'%0.1f'| format(value[2]|float)}}%
+                  </div>
+                  <div>
+                    {{'%0.1f'| format(value[0]|float)}} vs. {{'%0.1f'| format(value[1]|float)}}
+                  </div>
+                </td>
+              {% endif %}
             {% endfor %}
           </tr>
         {% endfor %}
       </tbody>
     </table>
-    {{metric}}
   </body>
 </html>
