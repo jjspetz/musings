@@ -9,8 +9,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.18.2",
+    "cheerio": "^1.0.0-rc.2",
     "html-validator": "^2.2.3",
     "pagespeed-insights": "^1.0.2",
+    "request": "^2.83.0",
     "w3c-css": "^2.0.1"
   }
 }
