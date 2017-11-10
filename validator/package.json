@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "html-validator": "^2.2.3",
+    "pagespeed-insights": "^1.0.2",
     "w3c-css": "^2.0.1"
   }
 }

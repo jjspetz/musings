@@ -4,43 +4,68 @@
 // get test speed date from https://developers.google.com/speed/pagespeed/insights/
 // make system for looking deeper based on class and scrapper
 
+const HTMLValidator = require('html-validator')
+var CSSValidator = require('w3c-css');
+const pagespeedInsights = require('pagespeed-insights');
+
+const URL = process.argv[2];
 
 // HTML validation
-// const validator = require('html-validator')
-// const options = {
-//  url: 'https://jjspetseris.com',
-//  format: 'json'
-// }
-//
-// validator(options)
-//   .then((data) => {
-//     console.log(data.messages.length)
-//   })
-//   .catch((error) => {
-//     console.error(error)
-//   })
+const options = {
+ url: URL,
+ format: 'json'
+}
 
-// TODO
-// from data pull error & warning count as seperate thing
+HTMLValidator(options)
+  .then((data) => {
+    var error = 0
+    var warning = 0;
+    // console.log(data.messages.length)
+    for(let i=0; i<data.messages.length; i++) {
+      if (data.messages[i].type === 'error') {
+        error++;
+      } else {
+        warning++;
+      }
+    }
 
+    console.log('HTML Warnings: ' + warning);
+    console.log('HTML Errors: ' + error);
+  })
+  .catch((error) => {
+    console.error(error)
+  })
 
 // CSS validation
-// var validator = require('w3c-css');
-//
-// validator.validate('https://jjspetseris.com/', function(err, data) {
-//   if(err) {
-//     // an error happened
-//     console.error(err);
-//   } else {
-//     // validation errors
-//     console.log('validation errors', data.errors.length);
-//
-//     // validation warnings
-//     console.log('validation warnings', data.warnings.length);
-//   }
-// });
+CSSValidator.validate(URL, function(err, data) {
+  if(err) {
+    // an error happened
+    console.error(err);
+  } else {
+    // validation warnings
+    console.log('CSS Warnings', data.warnings.length);
 
-// TODO
-// done
+    // validation errors
+    console.log('CSS Errors', data.errors.length);
+  }
+});
 
 // Speed tester
+var opts = {
+  url: URL,
+  apiKey: 'AIzaSyCJtrRIyMVDxjwj8vN260eMUw5aoGdjBfg',
+};
+
+function getSpeedScore(strat) {
+  opts.strategy = strat
+
+  pagespeedInsights(opts, (err, data) => {
+    // console.log(data)
+    console.log(strat + ' page speed: ' + data[opts.url + '/'].pageSpeed);
+  });
+};
+
+// for desktop
+getSpeedScore('desktop');
+// for mobile
+getSpeedScore('mobile');
