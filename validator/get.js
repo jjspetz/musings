@@ -11,7 +11,7 @@ const URLparse = require('url-parse');
 const scrapper = require('./scrapper.js');
 
 const URL = URLparse(process.argv[2]);
-const scrapDepth = process.argv[3] || 0;
+var scrapDepth = process.argv[3] || 5;
 
 function main() {
   // validate URL and format
@@ -27,6 +27,21 @@ function main() {
   HTMLCheck(url);
   CSSCheck(url);
   speedTest(url);
+
+  if (scrapDepth > 0) {
+    scrapper(url, function(results) {
+      // modifies depth of scrap if too deep
+      if (scrapDepth === 'all' || scrapDepth > results.length) {
+          scrapDepth = results.length;
+      }
+      for (let i=0; i<scrapDepth; i++) {
+        console.log(results[i]);
+        // HTMLCheck(results[i]);
+        // CSSCheck(results[i]);
+      }
+      // console.log(results);
+    });
+  }
 }
 
 
@@ -106,16 +121,3 @@ function speedTest(site) {
 
 // execute main function
 main();
-
-scrapper(URL.toString(), function(results) {
-  console.log(results);
-})
-// handles suburls (poorly)
-if (scrapDepth > 0) {
-  scrapper(URL.toString(), function(results) {
-    for (let i=0; i<scrapDepth; i++) {
-      HTMLCheck(results[i]);
-      CSSCheck(results[i]);
-    }
-  });
-}
