@@ -15,9 +15,10 @@ COMPARE = True
 def return_json():
     return jsonify(analytics.main(VIEW_ID, TIME_FRAME, COMPARE))
 
-@app.route('/account')
-def return_account():
-    return jsonify(analytics.get_account_info())
+# used for testing purposes only
+# @app.route('/account')
+# def return_account():
+#     return jsonify(analytics.get_account_info())
 
 @app.route('/')
 def home():
@@ -56,20 +57,17 @@ def home():
         for i in range(int(len(values)/2)):
             metric_val.append([values[i], values[i+10], calc_percent(values[i], values[i+10]), name])
 
-    return render_template('index.html', data=data, account=site, total=total_val, metric=metric_val)
+    return render_template('index.html', data=data, account=site, total=total_val, metric=metric_val, compare=COMPARE)
 
 @app.route('/change', methods=['POST'])
 def set_project():
     global VIEW_ID
     global TIME_FRAME
+    global COMPARE
     VIEW_ID = dict(request.form).get('site')[0]
     TIME_FRAME = dict(request.form).get('time')[0]
+    COMPARE = dict(request.form).get('compare')
     return redirect(url_for('home'))
-
-@app.route('/hello/<name>')
-def hello(name):
-    # show the user profile for that user
-    return ('Hello %s' % name)
 
 
 # functions
