@@ -5,12 +5,30 @@
 // make system for looking deeper based on class and scrapper
 
 const HTMLValidator = require('html-validator')
-var CSSValidator = require('w3c-css');
+const CSSValidator = require('w3c-css');
 const pagespeedInsights = require('pagespeed-insights');
+const URLparse = require('url-parse');
 const scrapper = require('./scrapper.js');
 
-const URL = process.argv[2];
+const URL = URLparse(process.argv[2]);
 const scrapDepth = process.argv[3] || 0;
+
+function main() {
+  // validate URL and format
+  var url;
+  // console.log(site)
+  if (URL.protocol) {
+    url = URL.toString()
+  } else {
+    url = 'http://' + URL.pathname;
+    // console.log(url)
+  }
+
+  HTMLCheck(url);
+  CSSCheck(url);
+  speedTest(url);
+}
+
 
 // HTML validation
 function HTMLCheck(site){
@@ -64,7 +82,7 @@ function CSSCheck(site) {
 // Speed tester
 function speedTest(site) {
   var opts = {
-    url: URL,
+    url: site,
     apiKey: 'AIzaSyCJtrRIyMVDxjwj8vN260eMUw5aoGdjBfg',
   };
 
@@ -86,17 +104,15 @@ function speedTest(site) {
 }
 
 
-// main function
-HTMLCheck(URL);
-CSSCheck(URL);
-speedTest(URL);
+// execute main function
+main();
 
-// scrapper(URL, function(results) {
-//   console.log(results);
-// })
+scrapper(URL.toString(), function(results) {
+  console.log(results);
+})
 // handles suburls (poorly)
 if (scrapDepth > 0) {
-  scrapper(URL, function(results) {
+  scrapper(URL.toString(), function(results) {
     for (let i=0; i<scrapDepth; i++) {
       HTMLCheck(results[i]);
       CSSCheck(results[i]);
